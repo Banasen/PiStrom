@@ -9,9 +9,12 @@ namespace PiStrom
     {
         private static void Main(string[] args)
         {
-            Console.WriteLine("Waiting for Connections");
-            FileServer fS = new FileServer();
-            fS.Start();
+            HttpServer httpServer = new HttpServer(System.Net.IPAddress.Any, 1337);
+            httpServer.Start();
+
+            Console.ReadLine();
+            httpServer.Stop();
+            Console.WriteLine("Server stopped.");
             Console.ReadLine();
         }
     }

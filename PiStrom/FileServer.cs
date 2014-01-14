@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
@@ -16,7 +17,7 @@ namespace PiStrom
 
         public void Start()
         {
-            TcpListener tcpListner = new TcpListener(localAddr, port);
+            TcpListener tcpListner = new TcpListener(IPAddress.Any, port);
             tcpListner.Start(); //start listening to client request
             while (true) //infinite loop
             {
@@ -67,8 +68,6 @@ namespace PiStrom
             {
                 Console.WriteLine("End of Response Header\r\n");
             }
-
-            //Icy-MetaData: 1
 
             bool sendMeta = false;
 
