@@ -22,6 +22,11 @@ namespace PiStrom
         private TcpListener tcpListener;
 
         /// <summary>
+        /// The directory that the Server bases the paths on.
+        /// </summary>
+        private DirectoryInfo rootDirectory;
+
+        /// <summary>
         /// <see cref="CancellationTokenSource"/> to provide a <see cref="CancellationToken"/> for stopping the listener <see cref="Task"/> and those handling the incoming connections.
         /// </summary>
         private CancellationTokenSource cancellationToken;
@@ -31,9 +36,10 @@ namespace PiStrom
         /// </summary>
         /// <param name="allowedAdresses">The address or address types that are allowed to connect.</param>
         /// <param name="port">The port the server should listen on.</param>
-        public HttpServer(IPAddress allowedAdresses, int port)
+        public HttpServer(IPAddress allowedAdresses, int port, DirectoryInfo rootDirectory)
         {
             tcpListener = new TcpListener(allowedAdresses, (int)port);
+            this.rootDirectory = rootDirectory;
 
             Connection += OnConnection;
         }

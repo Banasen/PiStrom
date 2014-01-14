@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 
@@ -9,7 +10,8 @@ namespace PiStrom
     {
         private static void Main(string[] args)
         {
-            HttpServer httpServer = new HttpServer(System.Net.IPAddress.Any, 1337);
+            DirectoryInfo rootDirectory = new DirectoryInfo(Directory.GetCurrentDirectory());
+            HttpServer httpServer = new HttpServer(System.Net.IPAddress.Any, 1337, rootDirectory);
             httpServer.Start();
 
             Console.ReadLine();
