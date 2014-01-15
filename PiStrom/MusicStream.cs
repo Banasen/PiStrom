@@ -18,6 +18,8 @@ namespace PiStrom
     {
         public StreamInfo StreamInfo { get; set; }
 
+        public bool Running { get; private set; }
+
         private Dictionary<Socket, bool> clients;
 
         private FileStream fileStream;
@@ -40,6 +42,11 @@ namespace PiStrom
             clients = new Dictionary<Socket, bool>();
 
             fileBuffer = new byte[StreamInfo.MetaInt];
+
+            fileStream = File.OpenRead("Empty");
+            fileStream.Position = fileStream.Length;
+
+            Running = false;
         }
 
         public void AddClient(Socket client, bool metaInfo)
@@ -51,8 +58,7 @@ namespace PiStrom
 
         public void Run(CancellationToken cancellationToken)
         {
-            fileStream = File.OpenRead("Empty");
-            fileStream.Position = fileStream.Length;
+            Running = true;
 
             while (!cancellationToken.IsCancellationRequested && clients.Count > 0)
             {
@@ -73,7 +79,7 @@ namespace PiStrom
 
                     List<byte> metaByteBuffer = new List<byte>();
 
-                    string meta = "StreamTitle='" + Regex.Match(possibleFiles[fileIndex], @"\\[^\\]*$").Value + "';";
+                    string meta = "StreamTitle='" + Regex.Match(possibleFiles[fileIndex], @"(?<=\\)[^\\]+(?=\.mp3$)").Value + "';";
                     meta = meta.PadRight(meta.Length + (16 - (meta.Length % 16)));
                     byte[] metaBytes = Encoding.UTF8.GetBytes(meta);
 
@@ -99,6 +105,8 @@ namespace PiStrom
 
                 remove.ForEach(client => clients.Remove(client));
             }
+
+            Running = false;
         }
     }
 }

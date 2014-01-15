@@ -26,6 +26,8 @@ namespace PiStrom
         /// </summary>
         private DirectoryInfo rootDirectory;
 
+        private Dictionary<string, MusicStream> streams = new Dictionary<string, MusicStream>();
+
         /// <summary>
         /// <see cref="CancellationTokenSource"/> to provide a <see cref="CancellationToken"/> for stopping the listener <see cref="Task"/> and those handling the incoming connections.
         /// </summary>
@@ -106,15 +108,27 @@ namespace PiStrom
 
             string[] requestSplit = request.Split(' ');
 
-            string path = rootDirectory.FullName + "\\Streams\\" + requestSplit[1].TrimStart('/').Replace('/', '\\') + ".xml";
-
-            if (File.Exists(path))
+            if (streams.ContainsKey(requestSplit[1]))
             {
-                MusicStream musicStream = new MusicStream(path);
+                streams[requestSplit[1]].AddClient(socket, sendIcyMeta);
 
-                musicStream.AddClient(socket, sendIcyMeta);
+                if (!streams[requestSplit[1]].Running)
+                    Task.Factory.StartNew(() => streams[requestSplit[1]].Run(cancellationToken));
+            }
+            else
+            {
+                string path = rootDirectory.FullName + "\\Streams\\" + requestSplit[1].TrimStart('/').Replace('/', '\\') + ".xml";
 
-                musicStream.Run(cancellationToken);
+                if (File.Exists(path))
+                {
+                    MusicStream musicStream = new MusicStream(path);
+
+                    musicStream.AddClient(socket, sendIcyMeta);
+
+                    Task.Factory.StartNew(() => musicStream.Run(cancellationToken));
+
+                    streams.Add(requestSplit[1], musicStream);
+                }
             }
 
             //socket.Send(Encoding.UTF8.GetBytes(responseHeader));
