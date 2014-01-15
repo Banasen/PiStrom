@@ -41,6 +41,12 @@ namespace PiStrom.Config
         public class MusicInfo
         {
             /// <summary>
+            /// Gets or sets the FileType (mp3, ogg, etc.) that the stream will use.
+            /// </summary>
+            [XmlAttribute("FileType")]
+            public string FileType { get; set; }
+
+            /// <summary>
             /// Gets or sets the <see cref="List"/> of <see cref="TimeSpans"/> for the stream.
             /// </summary>
             [XmlElement("TimeSpan")]
@@ -149,11 +155,11 @@ namespace PiStrom.Config
                 {
                     if (timeSpan.FromMinutes <= time && time <= timeSpan.TillMinutes)
                     {
-                        files.AddRange(timeSpan.Files);
+                        files.AddRange(timeSpan.Files.Where(file => file.EndsWith(FileType)));
 
                         foreach (string folder in timeSpan.Folders)
                         {
-                            files.AddRange(Directory.GetFiles(folder, "*.mp3", SearchOption.AllDirectories));
+                            files.AddRange(Directory.GetFiles(folder, "*." + FileType, SearchOption.AllDirectories));
                         }
                     }
                 }

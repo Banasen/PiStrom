@@ -3,7 +3,7 @@
   <Name>Electro Stream</Name>
   <Genre>Electro</Genre>
   <MetaInt>32768</MetaInt>
-  <Music>
+  <Music FileType="mp3">
     <TimeSpan From="00:00" Till="21:40">
       <Folder>C:\Users\Banane\Music\Binärpilot\Nordland</Folder>
       <File>C:\Users\Banane\Music\Binärpilot\Gunchip\01 - Gunchip 1986 Nautilus B.mp3</File>

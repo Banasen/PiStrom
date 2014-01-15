@@ -43,9 +43,6 @@ namespace PiStrom
 
             fileBuffer = new byte[StreamInfo.MetaInt];
 
-            fileStream = File.OpenRead("Empty");
-            fileStream.Position = fileStream.Length;
-
             Running = false;
         }
 
@@ -60,20 +57,25 @@ namespace PiStrom
         {
             Running = true;
 
+            fileStream = File.OpenRead("Empty");
+            fileStream.Position = fileStream.Length;
+
+            metaBuffer = new byte[1] { (byte)0 };
+
             while (!cancellationToken.IsCancellationRequested && clients.Count > 0)
             {
                 long restOfFile = fileStream.Length - fileStream.Position;
 
                 fileStream.Read(fileBuffer, 0, StreamInfo.MetaInt);
 
-                metaBuffer = new byte[1] { (byte)0 };
-
                 if (restOfFile < StreamInfo.MetaInt)
                 {
                     fileStream.Close();
                     fileStream.Dispose();
+
                     string[] possibleFiles = StreamInfo.Music.GetFilesForTime((uint)(DateTime.Now.Hour * 60 + DateTime.Now.Minute)).ToArray();
                     int fileIndex = random.Next(0, possibleFiles.Length);
+
                     fileStream = File.OpenRead(possibleFiles[fileIndex]);
                     fileStream.Read(fileBuffer, (int)restOfFile, (int)(StreamInfo.MetaInt - restOfFile));
 
