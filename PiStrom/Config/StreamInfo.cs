@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -24,6 +25,11 @@ namespace PiStrom.Config
         public string Genre { get; set; }
 
         /// <summary>
+        /// The Interval (in bytes) in which meta information about the stream is sent. Also the size of the byte buffer.
+        /// </summary>
+        public uint MetaInt { get; set; }
+
+        /// <summary>
         /// Gets or sets the Music that is played on the stream.
         /// </summary>
         public MusicInfo Music { get; set; }
@@ -34,12 +40,6 @@ namespace PiStrom.Config
         [XmlRoot("Music")]
         public class MusicInfo
         {
-            /// <summary>
-            /// Gets or sets the path that the folders and files will be relative to, if they aren't absolute.
-            /// </summary>
-            [XmlAttribute("RelativeTo")]
-            public string RelativeTo { get; set; }
-
             /// <summary>
             /// Gets or sets the <see cref="List"/> of <see cref="TimeSpans"/> for the stream.
             /// </summary>
@@ -60,16 +60,11 @@ namespace PiStrom.Config
                 {
                     get
                     {
-                        int minutes = FromMinutes % 60;
-                        int hours = (FromMinutes - minutes) / 60;
-                        return (hours < 10 ? "0" : "") + hours + ":" + (minutes < 10 ? "0" : "") + minutes;
+                        return TimeSpan.MinutesToString(FromMinutes);
                     }
                     set
                     {
-                        if (!Regex.IsMatch(value, "(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]")) throw new FormatException(value + " doesn't match format hh:mm, from 00:00 to 23:50!");
-
-                        string[] splitTime = value.Split(':');
-                        FromMinutes = int.Parse(splitTime[0]) * 60 + int.Parse(splitTime[1]);
+                        FromMinutes = TimeSpan.StringToMinutes(value);
                     }
                 }
 
@@ -77,7 +72,7 @@ namespace PiStrom.Config
                 /// Gets or sets the time at which this <see cref="TimeSpan"/> starts. Minutes from 00:00.
                 /// </summary>
                 [XmlIgnore()]
-                public int FromMinutes { get; set; }
+                public uint FromMinutes { get; set; }
 
                 /// <summary>
                 /// Gets or sets the time at which this <see cref="TimeSpan"/> ends. Format: hh:mm, from 00:00 to 23:59
@@ -87,16 +82,11 @@ namespace PiStrom.Config
                 {
                     get
                     {
-                        int minutes = TillMinutes % 60;
-                        int hours = (TillMinutes - minutes) / 60;
-                        return (hours < 10 ? "0" : "") + hours + ":" + (minutes < 10 ? "0" : "") + minutes;
+                        return TimeSpan.MinutesToString(TillMinutes);
                     }
                     set
                     {
-                        if (!Regex.IsMatch(value, "(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]")) throw new FormatException(value + " doesn't match format hh:mm, from 00:00 to 23:50!");
-
-                        string[] splitTime = value.Split(':');
-                        TillMinutes = int.Parse(splitTime[0]) * 60 + int.Parse(splitTime[1]);
+                        TillMinutes = TimeSpan.StringToMinutes(value);
                     }
                 }
 
@@ -104,7 +94,7 @@ namespace PiStrom.Config
                 /// Gets or sets the time at which this <see cref="TimeSpan"/> ends. Minutes from 00:00.
                 /// </summary>
                 [XmlIgnore()]
-                public int TillMinutes { get; set; }
+                public uint TillMinutes { get; set; }
 
                 /// <summary>
                 /// Gets or sets the <see cref="List"/> of folders from which music files for the stream can be sourced.
@@ -117,6 +107,58 @@ namespace PiStrom.Config
                 /// </summary>
                 [XmlElement("File")]
                 public List<string> Files { get; set; }
+
+                /// <summary>
+                /// Converts a time in the format hh:mm, from 00:00 to 23:59 into the minutes from 00:00.
+                /// </summary>
+                /// <param name="strTime">The time as string.</param>
+                /// <returns>The minutes from 00:00.</returns>
+                public static uint StringToMinutes(string strTime)
+                {
+                    if (!Regex.IsMatch(strTime, "(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]")) throw new FormatException(strTime + " doesn't match format hh:mm, from 00:00 to 23:50!");
+
+                    string[] splitTime = strTime.Split(':');
+                    return uint.Parse(splitTime[0]) * 60 + uint.Parse(splitTime[1]);
+                }
+
+                /// <summary>
+                /// Converts the time in minutes from 00:00 into the format hh:mm, from 0:00 to 23:59.
+                /// </summary>
+                /// <param name="time">The time from 00:00.</param>
+                /// <returns>The time as a string.</returns>
+                public static string MinutesToString(uint time)
+                {
+                    if (time > 1439) throw new ArgumentOutOfRangeException("Time must be between 0 (00:00) and 1439 (23:59).");
+
+                    uint minutes = time % 60;
+                    uint hours = (time - minutes) / 60;
+                    return (hours < 10 ? "0" : "") + hours + ":" + (minutes < 10 ? "0" : "") + minutes;
+                }
+            }
+
+            /// <summary>
+            /// Gets the paths to all the files that can be played at the given time.
+            /// </summary>
+            /// <param name="time">The time in minutes from 00:00.</param>
+            /// <returns>The paths to all the files for that time.</returns>
+            public List<string> GetFilesForTime(uint time)
+            {
+                List<string> files = new List<string>();
+
+                foreach (TimeSpan timeSpan in TimeSpans)
+                {
+                    if (timeSpan.FromMinutes <= time && time <= timeSpan.TillMinutes)
+                    {
+                        files.AddRange(timeSpan.Files);
+
+                        foreach (string folder in timeSpan.Folders)
+                        {
+                            files.AddRange(Directory.GetFiles(folder, "*.mp3", SearchOption.AllDirectories));
+                        }
+                    }
+                }
+
+                return files;
             }
         }
     }

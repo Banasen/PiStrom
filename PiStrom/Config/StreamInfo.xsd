@@ -10,6 +10,7 @@
       <xs:sequence>
         <xs:element name="Name" type="xs:string" />
         <xs:element name="Genre" type="xs:string" />
+        <xs:element name="MetaInt" type="xs:unsignedInt" />
         <xs:element name="Music">
           <xs:complexType>
             <xs:sequence>
@@ -24,7 +25,6 @@
                 </xs:complexType>
               </xs:element>
             </xs:sequence>
-            <xs:attribute name="RelativeTo" type="xs:anyURI" use="optional" />
           </xs:complexType>
         </xs:element>
       </xs:sequence>
