@@ -45,6 +45,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Config\PiStrom.cs">
+      <DependentUpon>PiStrom.xsd</DependentUpon>
+    </Compile>
     <Compile Include="Config\StreamInfo.cs">
       <DependentUpon>StreamInfo.xsd</DependentUpon>
     </Compile>
@@ -54,6 +57,13 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Config\PiStrom.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <None Include="Config\PiStrom.xsd">
+      <SubType>Designer</SubType>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="Empty">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

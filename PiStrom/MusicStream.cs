@@ -74,6 +74,8 @@ namespace PiStrom
                     fileStream.Dispose();
 
                     string[] possibleFiles = StreamInfo.Music.GetFilesForTime((uint)(DateTime.Now.Hour * 60 + DateTime.Now.Minute)).ToArray();
+                    if (possibleFiles.Length < 1) possibleFiles = Program.Config.DefaultMusic.GetFilesForFileType(StreamInfo.Music.FileType).ToArray();
+
                     int fileIndex = random.Next(0, possibleFiles.Length);
 
                     fileStream = File.OpenRead(possibleFiles[fileIndex]);
@@ -81,7 +83,7 @@ namespace PiStrom
 
                     List<byte> metaByteBuffer = new List<byte>();
 
-                    string meta = "StreamTitle='" + Regex.Match(possibleFiles[fileIndex], @"(?<=\" + Path.DirectorySeparatorChar + @")[^\" + Path.DirectorySeparatorChar + @"]+(?=\.mp3$)").Value + @"';";
+                    string meta = "StreamTitle='" + Regex.Match(possibleFiles[fileIndex], @"(?<=\" + Path.DirectorySeparatorChar + @")[^\" + Path.DirectorySeparatorChar + @"]+(?=\." + StreamInfo.Music.FileType + @"$)").Value + "';";
                     meta = meta.PadRight(meta.Length + (16 - (meta.Length % 16)));
                     byte[] metaBytes = Encoding.UTF8.GetBytes(meta);
 

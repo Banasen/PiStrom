@@ -1,8 +1,13 @@
-﻿using System;
+﻿using PiStrom.Config;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Text;
+using System.Xml;
+using System.Xml.Schema;
+using System.Xml.Serialization;
 
 namespace PiStrom
 {
@@ -10,8 +15,17 @@ namespace PiStrom
     {
         private static void Main(string[] args)
         {
+            XmlReader reader = XmlReader.Create("Config" + Path.DirectorySeparatorChar + "PiStrom.xml");
+            XmlSchema schema = new XmlSchema();
+            schema.SourceUri = "Config" + Path.DirectorySeparatorChar + "PiStrom.xsd";
+            reader.Settings.Schemas.Add(schema);
+            XmlSerializer serializer = new XmlSerializer(typeof(PiStromConfig));
+            Config = (PiStromConfig)serializer.Deserialize(reader);
+
+            if (Config.DefaultMusic.Files.Count < 1 && Config.DefaultMusic.Folders.Count < 1) throw new Exception("No default music provided.");
+
             DirectoryInfo rootDirectory = new DirectoryInfo(Directory.GetCurrentDirectory());
-            HttpServer httpServer = new HttpServer(System.Net.IPAddress.Any, 1337, rootDirectory);
+            HttpServer httpServer = new HttpServer(IPAddress.Any, (int)Config.Port, rootDirectory);
             httpServer.Start();
 
             Console.ReadLine();
@@ -19,5 +33,7 @@ namespace PiStrom
             Console.WriteLine("Server stopped.");
             Console.ReadLine();
         }
+
+        public static PiStromConfig Config;
     }
 }
