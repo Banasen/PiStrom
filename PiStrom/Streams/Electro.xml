@@ -4,9 +4,12 @@
   <Genre>Electro</Genre>
   <MetaInt>32768</MetaInt>
   <Music>
-    <TimeSpan From="00:00" Till="23:59">
+    <TimeSpan From="00:00" Till="21:40">
       <Folder>C:\Users\Banane\Music\Binärpilot\Nordland</Folder>
       <File>C:\Users\Banane\Music\Binärpilot\Gunchip\01 - Gunchip 1986 Nautilus B.mp3</File>
+    </TimeSpan>
+    <TimeSpan From="21:41" Till="23:59">
+      <Folder>C:\Users\Banane\Music\Chipzel</Folder>
     </TimeSpan>
   </Music>
 </StreamInfo>

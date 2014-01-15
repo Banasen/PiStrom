@@ -117,7 +117,7 @@ namespace PiStrom
             }
             else
             {
-                string path = rootDirectory.FullName + "\\Streams\\" + requestSplit[1].TrimStart('/').Replace('/', '\\') + ".xml";
+                string path = rootDirectory.FullName + Path.DirectorySeparatorChar + "Streams" + Path.DirectorySeparatorChar + requestSplit[1].TrimStart('/').Replace('/', Path.DirectorySeparatorChar) + ".xml";
 
                 if (File.Exists(path))
                 {

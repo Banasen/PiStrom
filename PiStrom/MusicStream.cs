@@ -34,7 +34,7 @@ namespace PiStrom
         {
             XmlReader reader = XmlReader.Create(configPath);
             XmlSchema schema = new XmlSchema();
-            schema.SourceUri = @"Config\StreamInfo.xsd";
+            schema.SourceUri = @"Config" + Path.DirectorySeparatorChar + "StreamInfo.xsd";
             reader.Settings.Schemas.Add(schema);
             XmlSerializer serializer = new XmlSerializer(typeof(StreamInfo));
             StreamInfo = (StreamInfo)serializer.Deserialize(reader);
@@ -79,7 +79,7 @@ namespace PiStrom
 
                     List<byte> metaByteBuffer = new List<byte>();
 
-                    string meta = "StreamTitle='" + Regex.Match(possibleFiles[fileIndex], @"(?<=\\)[^\\]+(?=\.mp3$)").Value + "';";
+                    string meta = "StreamTitle='" + Regex.Match(possibleFiles[fileIndex], @"(?<=\" + Path.DirectorySeparatorChar + @")[^\" + Path.DirectorySeparatorChar + @"]+(?=\.mp3$)").Value + @"';";
                     meta = meta.PadRight(meta.Length + (16 - (meta.Length % 16)));
                     byte[] metaBytes = Encoding.UTF8.GetBytes(meta);
 

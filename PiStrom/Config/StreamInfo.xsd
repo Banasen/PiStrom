@@ -14,7 +14,7 @@
         <xs:element name="Music">
           <xs:complexType>
             <xs:sequence>
-              <xs:element name="TimeSpan">
+              <xs:element minOccurs="1" maxOccurs="unbounded" name="TimeSpan">
                 <xs:complexType>
                   <xs:sequence>
                     <xs:element minOccurs="0" maxOccurs="unbounded" name="Folder" type="xs:anyURI" />
