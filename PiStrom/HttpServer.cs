@@ -104,47 +104,58 @@ namespace PiStrom
                 sendIcyMeta = headers["Icy-MetaData"] == "1";
             }
 
-            socket.Send(Encoding.UTF8.GetBytes(responseHeader));
+            string[] requestSplit = request.Split(' ');
 
-            string[] files = new string[] { @"C:\Users\Banane\Music\Binärpilot\Nordland\10 - Nordland.mp3", @"C:\Users\Banane\Music\Binärpilot\Nordland\01 - aXXo.mp3" };
-            string[] names = new string[] { "Nordland", "aXXo" };
+            string path = rootDirectory.FullName + "\\Streams\\" + requestSplit[1].TrimStart('/').Replace('/', '\\') + ".xml";
 
-            buffer = new byte[32768];
-
-            try
+            if (File.Exists(path))
             {
-                for (int i = 0; i < 2; i++)
-                {
-                    FileStream fileStream = File.OpenRead(files[i]);
+                MusicStream musicStream = new MusicStream(path);
 
-                    while (fileStream.Position < fileStream.Length)
-                    {
-                        fileStream.Read(buffer, 0, buffer.Length);
-                        socket.Send(buffer);
+                musicStream.AddClient(socket, sendIcyMeta);
 
-                        if (sendIcyMeta)
-                        {
-                            List<byte> metaByteBuffer = new List<byte>();
-
-                            string meta = "StreamTitle='" + names[i] + "';";
-                            meta = meta.PadRight(meta.Length + (16 - (meta.Length % 16)));
-                            byte[] metaBytes = Encoding.UTF8.GetBytes(meta);
-
-                            metaByteBuffer.Add((byte)(metaBytes.Length / 16));
-                            metaByteBuffer.AddRange(metaBytes);
-
-                            socket.Send(metaByteBuffer.ToArray());
-                        }
-                    }
-                }
+                musicStream.Run(cancellationToken);
             }
-            catch
-            {
-                Console.WriteLine("Connection dropped.");
-            }
+
+            //socket.Send(Encoding.UTF8.GetBytes(responseHeader));
+
+            //string[] files = new string[] { @"C:\Users\Banane\Music\Binärpilot\Nordland\10 - Nordland.mp3", @"C:\Users\Banane\Music\Binärpilot\Nordland\01 - aXXo.mp3" };
+            //string[] names = new string[] { "Nordland", "aXXo" };
+
+            //buffer = new byte[32768];
+
+            //try
+            //{
+            //    for (int i = 0; i < 2; i++)
+            //    {
+            //        FileStream fileStream = File.OpenRead(files[i]);
+
+            //        while (fileStream.Position < fileStream.Length)
+            //        {
+            //            fileStream.Read(buffer, 0, buffer.Length);
+            //            socket.Send(buffer);
+
+            //            if (sendIcyMeta)
+            //            {
+            //                List<byte> metaByteBuffer = new List<byte>();
+
+            //                string meta = "StreamTitle='" + names[i] + "';";
+            //                meta = meta.PadRight(meta.Length + (16 - (meta.Length % 16)));
+            //                byte[] metaBytes = Encoding.UTF8.GetBytes(meta);
+
+            //                metaByteBuffer.Add((byte)(metaBytes.Length / 16));
+            //                metaByteBuffer.AddRange(metaBytes);
+
+            //                socket.Send(metaByteBuffer.ToArray());
+            //            }
+            //        }
+            //    }
+            //}
+            //catch
+            //{
+            //    Console.WriteLine("Connection dropped.");
+            //}
         }
-
-        private string responseHeader = "HTTP/1.1 200 OK\r\nContent-Type: audio/mpeg\r\nServer: PiStrøm\r\nCache-Control: no-cache\r\nPragma: no-cache\r\nConnection: close\r\nicy-metaint:32768\r\nicy-name:Binärpilot Stream\r\nicy-genre:Electronic\r\nicy-url:http://localhost:1337\r\n\r\n";
 
         public void Start()
         {

@@ -27,7 +27,7 @@ namespace PiStrom.Config
         /// <summary>
         /// The Interval (in bytes) in which meta information about the stream is sent. Also the size of the byte buffer.
         /// </summary>
-        public uint MetaInt { get; set; }
+        public int MetaInt { get; set; }
 
         /// <summary>
         /// Gets or sets the Music that is played on the stream.
@@ -77,7 +77,7 @@ namespace PiStrom.Config
                 /// <summary>
                 /// Gets or sets the time at which this <see cref="TimeSpan"/> ends. Format: hh:mm, from 00:00 to 23:59
                 /// </summary>
-                [XmlAttribute("From")]
+                [XmlAttribute("Till")]
                 public string Till
                 {
                     get
