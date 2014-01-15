@@ -26,13 +26,13 @@ namespace PiStrom.Config
         /// <summary>
         /// Gets or sets the Music that is played on the stream.
         /// </summary>
-        public Music Music { get; set; }
+        public MusicInfo Music { get; set; }
 
         /// <summary>
         /// Represents the music that will be played on the stream, divided into timespans.
         /// </summary>
         [XmlRoot("Music")]
-        public class Music
+        public class MusicInfo
         {
             /// <summary>
             /// Gets or sets the path that the folders and files will be relative to, if they aren't absolute.
