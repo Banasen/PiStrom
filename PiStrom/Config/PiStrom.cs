@@ -26,40 +26,16 @@ namespace PiStrom.Config
         public class Music
         {
             /// <summary>
-            /// Backing variable for the Folders Property.
-            /// </summary>
-            private List<string> folders = new List<string>();
-
-            /// <summary>
             /// Gets or sets the <see cref="List"/> of folders from which music files for the stream can be sourced.
             /// </summary>
             [XmlElement("Folder")]
-            public List<string> Folders
-            {
-                get { return folders; }
-                set
-                {
-                    folders = value.Where(folder => Directory.Exists(folder)).ToList();
-                }
-            }
-
-            /// <summary>
-            /// Backing variable for the Files Property.
-            /// </summary>
-            private List<string> files = new List<string>();
+            public List<string> Folders { get; set; }
 
             /// <summary>
             /// Gets or sets the <see cref="List"/> of files which can be played in the stream. Doesn't include the files from the Folders <see cref="List"/>.
             /// </summary>
             [XmlElement("File")]
-            public List<string> Files
-            {
-                get { return files; }
-                set
-                {
-                    files = value.Where(file => File.Exists(file)).ToList();
-                }
-            }
+            public List<string> Files { get; set; }
 
             /// <summary>
             /// Gets the paths to all the files that can be played at the given time.
@@ -68,7 +44,7 @@ namespace PiStrom.Config
             /// <returns>The paths to all the files for that time.</returns>
             public List<string> GetFilesForFileType(string fileType)
             {
-                List<string> files = new List<string>(Files.Where(file => file.EndsWith(fileType)));
+                List<string> files = new List<string>(Files.Where(file => file.EndsWith(fileType) && File.Exists(file)));
 
                 foreach (string folder in Folders)
                 {

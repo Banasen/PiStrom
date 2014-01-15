@@ -103,40 +103,16 @@ namespace PiStrom.Config
                 public uint TillMinutes { get; set; }
 
                 /// <summary>
-                /// Backing variable for the Folders Property.
-                /// </summary>
-                private List<string> folders = new List<string>();
-
-                /// <summary>
                 /// Gets or sets the <see cref="List"/> of folders from which music files for the stream can be sourced.
                 /// </summary>
                 [XmlElement("Folder")]
-                public List<string> Folders
-                {
-                    get { return folders; }
-                    set
-                    {
-                        folders = value.Where(folder => Directory.Exists(folder)).ToList();
-                    }
-                }
-
-                /// <summary>
-                /// Backing variable for the Files Property.
-                /// </summary>
-                private List<string> files = new List<string>();
+                public List<string> Folders { get; set; }
 
                 /// <summary>
                 /// Gets or sets the <see cref="List"/> of files which can be played in the stream. Doesn't include the files from the Folders <see cref="List"/>.
                 /// </summary>
                 [XmlElement("File")]
-                public List<string> Files
-                {
-                    get { return files; }
-                    set
-                    {
-                        files = value.Where(file => File.Exists(file)).ToList();
-                    }
-                }
+                public List<string> Files { get; set; }
 
                 /// <summary>
                 /// Converts a time in the format hh:mm, from 00:00 to 23:59 into the minutes from 00:00.
@@ -179,7 +155,7 @@ namespace PiStrom.Config
                 {
                     if (timeSpan.FromMinutes <= time && time <= timeSpan.TillMinutes)
                     {
-                        files.AddRange(timeSpan.Files.Where(file => file.EndsWith(FileType)));
+                        files.AddRange(timeSpan.Files.Where(file => file.EndsWith(FileType) && File.Exists(file)));
 
                         foreach (string folder in timeSpan.Folders)
                         {
