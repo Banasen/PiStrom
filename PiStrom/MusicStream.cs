@@ -48,7 +48,7 @@ namespace PiStrom
 
         public void AddClient(Socket client, bool metaInfo)
         {
-            string responseHeader = "HTTP/1.1 200 OK\r\nContent-Type: audio/mpeg\r\nServer: PiStrøm\r\nCache-Control: no-cache\r\nPragma: no-cache\r\nConnection: close\r\n" + (metaInfo ? "icy-metaint:" + StreamInfo.MetaInt + "\r\nicy-name:" + StreamInfo.Name + "\r\nicy-genre:" + StreamInfo.Genre + "\r\n" : "") + "\r\n"; //icy-url:http://localhost:1337\r\n
+            string responseHeader = "HTTP/1.1 200 OK\r\nContent-Type: application/octet-stream\r\nServer: PiStrøm\r\nCache-Control: no-cache\r\nPragma: no-cache\r\nConnection: close\r\n" + (metaInfo ? "icy-metaint:" + StreamInfo.MetaInt + "\r\nicy-name:" + StreamInfo.Name + "\r\nicy-genre:" + StreamInfo.Genre + "\r\n" : "") + "\r\n"; //icy-url:http://localhost:1337\r\n type: audio/mpeg
             client.Send(Encoding.UTF8.GetBytes(responseHeader));
             clients.Add(client, metaInfo);
         }

@@ -5,8 +5,9 @@
   <MetaInt>32768</MetaInt>
   <Music FileType="mp3">
     <TimeSpan From="02:00" Till="21:40">
-      <Folder>C:\Users\Banane\Music\Binärpilot\Nordland</Folder>
-      <File>C:\Users\Banane\Music\Binärpilot\Gunchip\01 - Gunchip 1986 Nautilus B.mp3</File>
+      <Folder>C:\Users\Banane\Music\Binärpilot</Folder>
+      <Folder>C:\Users\Banane\Music\Disasterpeace</Folder>
+      <File>C:\Users\Banane\Music\Popcorn\Hot Butter - Popcorn.mp3</File>
     </TimeSpan>
     <TimeSpan From="21:41" Till="23:59">
       <Folder>C:\Users\Banane\Music\Chipzel</Folder>
