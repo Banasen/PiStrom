@@ -64,9 +64,6 @@
       <SubType>Designer</SubType>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="Empty">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
     <Content Include="Streams\Electro.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

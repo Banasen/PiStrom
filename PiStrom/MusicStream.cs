@@ -57,39 +57,18 @@ namespace PiStrom
         {
             Running = true;
 
-            fileStream = File.OpenRead("Empty");
-            fileStream.Position = fileStream.Length;
-
-            metaBuffer = new byte[1] { (byte)0 };
+            if (fileStream == null)
+                setNewSourceFile();
 
             while (!cancellationToken.IsCancellationRequested && clients.Count > 0)
             {
-                long restOfFile = fileStream.Length - fileStream.Position;
+                int read = fileStream.Read(fileBuffer, 0, StreamInfo.MetaInt);
 
-                fileStream.Read(fileBuffer, 0, StreamInfo.MetaInt);
-
-                if (restOfFile < StreamInfo.MetaInt)
+                if (read < StreamInfo.MetaInt)
                 {
-                    fileStream.Close();
-                    fileStream.Dispose();
+                    setNewSourceFile();
 
-                    string[] possibleFiles = StreamInfo.Music.GetFilesForTime((uint)(DateTime.Now.Hour * 60 + DateTime.Now.Minute)).ToArray();
-                    if (possibleFiles.Length < 1) possibleFiles = Program.Config.DefaultMusic.GetFilesForFileType(StreamInfo.Music.FileType).ToArray();
-
-                    int fileIndex = random.Next(0, possibleFiles.Length);
-
-                    fileStream = File.OpenRead(possibleFiles[fileIndex]);
-                    fileStream.Read(fileBuffer, (int)restOfFile, (int)(StreamInfo.MetaInt - restOfFile));
-
-                    List<byte> metaByteBuffer = new List<byte>();
-
-                    string meta = "StreamTitle='" + Regex.Match(possibleFiles[fileIndex], @"(?<=\" + Path.DirectorySeparatorChar + @")[^\" + Path.DirectorySeparatorChar + @"]+(?=\." + StreamInfo.Music.FileType + @"$)").Value + "';";
-                    meta = meta.PadRight(meta.Length + (16 - (meta.Length % 16)));
-                    byte[] metaBytes = Encoding.UTF8.GetBytes(meta);
-
-                    metaByteBuffer.Add((byte)(metaBytes.Length / 16));
-                    metaByteBuffer.AddRange(metaBytes);
-                    metaBuffer = metaByteBuffer.ToArray();
+                    fileStream.Read(fileBuffer, read, StreamInfo.MetaInt - read);
                 }
 
                 List<Socket> remove = new List<Socket>();
@@ -111,6 +90,32 @@ namespace PiStrom
             }
 
             Running = false;
+        }
+
+        private void setNewSourceFile()
+        {
+            if (fileStream != null)
+            {
+                fileStream.Close();
+                fileStream.Dispose();
+            }
+
+            string[] possibleFiles = StreamInfo.Music.GetFilesForTime((uint)(DateTime.Now.Hour * 60 + DateTime.Now.Minute)).ToArray();
+            if (possibleFiles.Length < 1) possibleFiles = Program.Config.DefaultMusic.GetFilesForFileType(StreamInfo.Music.FileType).ToArray();
+
+            int fileIndex = random.Next(0, possibleFiles.Length);
+
+            fileStream = File.OpenRead(possibleFiles[fileIndex]);
+
+            List<byte> metaByteBuffer = new List<byte>();
+
+            string meta = "StreamTitle='" + Regex.Match(possibleFiles[fileIndex], @"(?<=\" + Path.DirectorySeparatorChar + @")[^\" + Path.DirectorySeparatorChar + @"]+(?=\." + StreamInfo.Music.FileType + @"$)").Value + "';";
+            meta = meta.PadRight(meta.Length + (16 - (meta.Length % 16)));
+            byte[] metaBytes = Encoding.UTF8.GetBytes(meta);
+
+            metaByteBuffer.Add((byte)(metaBytes.Length / 16));
+            metaByteBuffer.AddRange(metaBytes);
+            metaBuffer = metaByteBuffer.ToArray();
         }
     }
 }
