@@ -3,6 +3,7 @@
   <Name>Electro Stream</Name>
   <Genre>Electro</Genre>
   <MetaInt>32768</MetaInt>
+  <TargetByteRate>24000</TargetByteRate>
   <Music FileType="mp3">
     <TimeSpan From="02:00" Till="21:40">
       <Folder>C:\Users\Banane\Music\Binärpilot</Folder>

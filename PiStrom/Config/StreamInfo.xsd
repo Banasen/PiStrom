@@ -11,6 +11,7 @@
         <xs:element name="Name" type="xs:string" />
         <xs:element name="Genre" type="xs:string" />
         <xs:element name="MetaInt" type="xs:unsignedInt" />
+        <xs:element name="TargetByteRate" type="xs:unsignedInt" />
         <xs:element name="Music">
           <xs:complexType>
             <xs:sequence>

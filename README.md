@@ -66,6 +66,7 @@ This folder contains the informations for the individual streams that will be av
   <Name>Electro Stream</Name>
   <Genre>Electro</Genre>
   <MetaInt>32768</MetaInt>
+  <TargetByteRate>24000</TargetByteRate>
   <Music FileType="mp3">
     <TimeSpan From="02:00" Till="21:40">
       <Folder>C:\Users\Banane\Music\Binärpilot</Folder>
@@ -85,6 +86,8 @@ While it is a bit more complex than `PiStrom.xml`, it's easy to understand as we
 * `<Genre>` is the Genre of the music in the Stream.
 
 * `<MetaInt>` is the interval (in bytes) at which MetaInfo will be embedded into the Stream. Also defines the size of the buffer into which is read from the file and from which is written into the Stream.
+
+* `<TargetByteRate>` is the maximum rate at which data is sent. In bytes per second. To get the value from the kbit/s of the music, multiply by 8000. For example 192kbit/s would require 24000 byte/s.
 
 Now, the values for Name and Genre only matter if the Client requests `Ice-MetaInt: 1` as a HTTP header in the request. The MetaInfo will also only be sent if that was requested, but it still defines the buffer size.
 

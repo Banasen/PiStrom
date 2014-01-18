@@ -25,9 +25,14 @@ namespace PiStrom.Config
         public string Genre { get; set; }
 
         /// <summary>
-        /// The Interval (in bytes) in which meta information about the stream is sent. Also the size of the byte buffer.
+        /// Gets or sets the interval (in bytes) in which meta information about the stream is sent. Also the size of the byte buffer.
         /// </summary>
         public int MetaInt { get; set; }
+
+        /// <summary>
+        /// Gets or sets the maximum rate at which data is sent. In bytes per second.
+        /// </summary>
+        public int TargetByteRate { get; set; }
 
         /// <summary>
         /// Gets or sets the Music that is played on the stream.

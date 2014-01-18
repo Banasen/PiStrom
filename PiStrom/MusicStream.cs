@@ -30,6 +30,8 @@ namespace PiStrom
 
         private Random random = new Random();
 
+        private int delay;
+
         public MusicStream(string configPath)
         {
             XmlReader reader = XmlReader.Create(configPath);
@@ -43,12 +45,14 @@ namespace PiStrom
 
             fileBuffer = new byte[StreamInfo.MetaInt];
 
+            delay = (int)(((double)StreamInfo.MetaInt / (double)StreamInfo.TargetByteRate) * 1000d);
+
             Running = false;
         }
 
         public void AddClient(Socket client, bool metaInfo)
         {
-            string responseHeader = "HTTP/1.1 200 OK\r\nContent-Type: application/octet-stream\r\nServer: PiStrøm\r\nCache-Control: no-cache\r\nPragma: no-cache\r\nConnection: close\r\n" + (metaInfo ? "icy-metaint:" + StreamInfo.MetaInt + "\r\nicy-name:" + StreamInfo.Name + "\r\nicy-genre:" + StreamInfo.Genre + "\r\n" : "") + "\r\n"; //icy-url:http://localhost:1337\r\n type: audio/mpeg
+            string responseHeader = "HTTP/1.1 200 OK\r\nContent-Type: audio/mpeg\r\nServer: PiStrøm\r\nCache-Control: no-cache\r\nPragma: no-cache\r\nConnection: close\r\n" + (metaInfo ? "icy-metaint:" + StreamInfo.MetaInt + "\r\nicy-name:" + StreamInfo.Name + "\r\nicy-genre:" + StreamInfo.Genre + "\r\n" : "") + "\r\n"; //icy-url:http://localhost:1337\r\n type: audio/mpeg
             client.Send(Encoding.UTF8.GetBytes(responseHeader));
             clients.Add(client, metaInfo);
         }
@@ -56,6 +60,8 @@ namespace PiStrom
         public void Run(CancellationToken cancellationToken)
         {
             Running = true;
+
+            DateTime lastSend = DateTime.Now.AddDays(-1);
 
             if (fileStream == null)
                 setNewSourceFile();
@@ -72,6 +78,13 @@ namespace PiStrom
                 }
 
                 List<Socket> remove = new List<Socket>();
+
+                int sinceLastSend = (int)(DateTime.Now - lastSend).TotalMilliseconds;
+                if (sinceLastSend < delay)
+                {
+                    Thread.Sleep(delay - sinceLastSend);
+                }
+                lastSend = DateTime.Now;
 
                 Parallel.ForEach(clients, client =>
                 {
