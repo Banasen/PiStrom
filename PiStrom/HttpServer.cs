@@ -129,46 +129,11 @@ namespace PiStrom
 
                     streams.Add(requestSplit[1], musicStream);
                 }
+                else
+                {
+                    socket.Close();
+                }
             }
-
-            //socket.Send(Encoding.UTF8.GetBytes(responseHeader));
-
-            //string[] files = new string[] { @"C:\Users\Banane\Music\Binärpilot\Nordland\10 - Nordland.mp3", @"C:\Users\Banane\Music\Binärpilot\Nordland\01 - aXXo.mp3" };
-            //string[] names = new string[] { "Nordland", "aXXo" };
-
-            //buffer = new byte[32768];
-
-            //try
-            //{
-            //    for (int i = 0; i < 2; i++)
-            //    {
-            //        FileStream fileStream = File.OpenRead(files[i]);
-
-            //        while (fileStream.Position < fileStream.Length)
-            //        {
-            //            fileStream.Read(buffer, 0, buffer.Length);
-            //            socket.Send(buffer);
-
-            //            if (sendIcyMeta)
-            //            {
-            //                List<byte> metaByteBuffer = new List<byte>();
-
-            //                string meta = "StreamTitle='" + names[i] + "';";
-            //                meta = meta.PadRight(meta.Length + (16 - (meta.Length % 16)));
-            //                byte[] metaBytes = Encoding.UTF8.GetBytes(meta);
-
-            //                metaByteBuffer.Add((byte)(metaBytes.Length / 16));
-            //                metaByteBuffer.AddRange(metaBytes);
-
-            //                socket.Send(metaByteBuffer.ToArray());
-            //            }
-            //        }
-            //    }
-            //}
-            //catch
-            //{
-            //    Console.WriteLine("Connection dropped.");
-            //}
         }
 
         public void Start()
