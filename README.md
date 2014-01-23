@@ -3,6 +3,8 @@ PiStrøm
 
 Streaming music from the RaspberryPi to other devices in the network.
 
+**IMPORTANT NOTICE: This only works on Linux Distributions that use Soft Floats! This is due to a bug in the Mono runtime involving any floats in function calls to a library!**
+
 
 How to Install
 --------------
