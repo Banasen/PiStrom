@@ -50,7 +50,8 @@
     <Compile Include="Config\StreamInfo.cs">
       <DependentUpon>StreamInfo.xsd</DependentUpon>
     </Compile>
-    <Compile Include="HttpServer.cs" />
+    <Compile Include="Http\Header.cs" />
+    <Compile Include="Http\Server.cs" />
     <Compile Include="MusicStream.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

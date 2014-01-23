@@ -9,7 +9,7 @@ How to Install
 
 #### Step 1 ####
 
-Download [PiStrøm](http://sp.svennp.com/PiStrom/PiStrom.zip) Executable
+Download the latest PiStrøm Executable in the [Releases](https://github.com/Banasen/PiStrom/releases) tab.
 
 #### Step 2 ####
 

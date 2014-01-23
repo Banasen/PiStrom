@@ -1,4 +1,5 @@
 ﻿using PiStrom.Config;
+using PiStrom.Http;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -25,7 +26,7 @@ namespace PiStrom
             if (Config.DefaultMusic.Files.Count < 1 && Config.DefaultMusic.Folders.Count < 1) throw new Exception("No default music provided.");
 
             DirectoryInfo rootDirectory = new DirectoryInfo(Directory.GetCurrentDirectory());
-            HttpServer httpServer = new HttpServer(IPAddress.Any, (int)Config.Port, rootDirectory);
+            Server httpServer = new Server(IPAddress.Any, (int)Config.Port, rootDirectory);
             httpServer.Start();
 
             Console.ReadLine();

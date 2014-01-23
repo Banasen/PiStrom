@@ -9,12 +9,12 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace PiStrom
+namespace PiStrom.Http
 {
     /// <summary>
     /// Represents the Server used to handle the incoming requests.
     /// </summary>
-    public sealed class HttpServer
+    public sealed class Server
     {
         /// <summary>
         /// <see cref="TcpListener"/> to listen for incoming requests.
@@ -34,11 +34,11 @@ namespace PiStrom
         private CancellationTokenSource cancellationToken;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="HttpServer"/> Class.
+        /// Initializes a new instance of the <see cref="Server"/> Class.
         /// </summary>
         /// <param name="allowedAdresses">The address or address types that are allowed to connect.</param>
         /// <param name="port">The port the server should listen on.</param>
-        public HttpServer(IPAddress allowedAdresses, int port, DirectoryInfo rootDirectory)
+        public Server(IPAddress allowedAdresses, int port, DirectoryInfo rootDirectory)
         {
             tcpListener = new TcpListener(allowedAdresses, (int)port);
             this.rootDirectory = rootDirectory;
