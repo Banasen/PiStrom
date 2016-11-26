@@ -4,8 +4,6 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
-using System.Runtime.Remoting.Messaging;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -17,9 +15,9 @@ namespace PiStrom.Http
     public sealed class Server
     {
         /// <summary>
-        /// <see cref="TcpListener"/> to listen for incoming requests.
+        /// <see cref="CancellationTokenSource"/> to provide a <see cref="CancellationToken"/> for stopping the listener <see cref="Task"/> and those handling the incoming connections.
         /// </summary>
-        private TcpListener tcpListener;
+        private CancellationTokenSource cancellationTokenSource;
 
         /// <summary>
         /// The directory that the Server bases the paths on.
@@ -29,9 +27,9 @@ namespace PiStrom.Http
         private Dictionary<string, MusicStream> streams = new Dictionary<string, MusicStream>();
 
         /// <summary>
-        /// <see cref="CancellationTokenSource"/> to provide a <see cref="CancellationToken"/> for stopping the listener <see cref="Task"/> and those handling the incoming connections.
+        /// <see cref="TcpListener"/> to listen for incoming requests.
         /// </summary>
-        private CancellationTokenSource cancellationToken;
+        private TcpListener tcpListener;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Server"/> Class.
@@ -40,19 +38,53 @@ namespace PiStrom.Http
         /// <param name="port">The port the server should listen on.</param>
         public Server(IPAddress allowedAdresses, int port, DirectoryInfo rootDirectory)
         {
-            tcpListener = new TcpListener(allowedAdresses, (int)port);
+            tcpListener = new TcpListener(allowedAdresses, port);
             this.rootDirectory = rootDirectory;
 
-            Connection += OnConnection;
+            Connection += server_Connection;
+        }
+
+        public void Start()
+        {
+            tcpListener.Start();
+
+            cancellationTokenSource = new CancellationTokenSource();
+
+            Task.Run(async () =>
+                {
+                    while (true)
+                    {
+                        var client = await tcpListener.AcceptTcpClientAsync();
+
+                        onConnection(client);
+                    }
+                }, cancellationTokenSource.Token);
+        }
+
+        public void Stop()
+        {
+            if (cancellationTokenSource != null)
+            {
+                cancellationTokenSource.Cancel();
+
+                tcpListener.Stop();
+            }
+        }
+
+        private void onConnection(TcpClient client)
+        {
+            Connection?.Invoke(client, cancellationTokenSource.Token);
         }
 
         /// <summary>
         /// Handles the incoming connections.
         /// </summary>
-        /// <param name="socket">The socket that the connection uses.</param>
+        /// <param name="client">The socket that the connection uses.</param>
         /// <param name="cancellationToken">The <see cref="CancellationToken"/> for closing the connection.</param>
-        private void OnConnection(Socket socket, CancellationToken cancellationToken)
+        private void server_Connection(TcpClient client, CancellationToken cancellationToken)
         {
+            var reader = new StreamReader(client.GetStream());
+
             string request = "";
             Dictionary<string, string> headers = new Dictionary<string, string>();
 
@@ -60,17 +92,14 @@ namespace PiStrom.Http
 
             try
             {
-                string received = "";
+                string received = null;
 
-                while (received != "\r\n")
+                while (received != "")
                 {
-                    socket.Receive(buffer);
+                    received = reader.ReadLine();
 
-                    received += Encoding.UTF8.GetString(buffer);
-
-                    if (received.EndsWith("\r\n") && received.Length > 2)
+                    if (received != null && received.Length > 2)
                     {
-                        received = received.TrimEnd('\r', '\n');
                         string[] splitReceived = received.Split(':');
 
                         if (splitReceived.Length < 2)
@@ -79,10 +108,9 @@ namespace PiStrom.Http
                         }
                         else
                         {
-                            headers.Add(splitReceived[0], string.Join(":", splitReceived.Skip(1)).Trim());
+                            if (!headers.ContainsKey(splitReceived[0]))
+                                headers.Add(splitReceived[0], string.Join(":", splitReceived.Skip(1)).Trim());
                         }
-
-                        received = "";
                     }
                 }
             }
@@ -93,97 +121,47 @@ namespace PiStrom.Http
 
             Console.WriteLine("Request: " + request);
             Console.WriteLine("Headers:");
-            foreach (KeyValuePair<string, string> header in headers)
+            foreach (var header in headers)
             {
-                Console.WriteLine(header.Key + " -> " + header.Value);
+                Console.WriteLine(header.Key + ": " + header.Value);
             }
             Console.WriteLine("End of Headers");
+            Console.WriteLine();
 
-            bool sendIcyMeta = false;
-            //Icy-MetaData: 1
-            if (headers.ContainsKey("Icy-MetaData"))
-            {
-                sendIcyMeta = headers["Icy-MetaData"] == "1";
-            }
+            var sendIcyMeta = headers.ContainsKey("Icy-MetaData") && headers["Icy-MetaData"] == "1";
 
             string[] requestSplit = request.Split(' ');
 
             if (streams.ContainsKey(requestSplit[1]))
             {
-                streams[requestSplit[1]].AddClient(socket, sendIcyMeta);
+                streams[requestSplit[1]].AddClient(client, sendIcyMeta);
 
                 if (!streams[requestSplit[1]].Running)
-                    Task.Factory.StartNew(() => streams[requestSplit[1]].Run(cancellationToken));
+                    Task.Run(() => (Action)streams[requestSplit[1]].Run, cancellationToken);
             }
             else
             {
-                string path = rootDirectory.FullName + Path.DirectorySeparatorChar + "Streams" + Path.DirectorySeparatorChar + requestSplit[1].TrimStart('/').Replace('/', Path.DirectorySeparatorChar) + ".xml";
+                string path = Path.Combine(rootDirectory.FullName, "Streams", requestSplit[1].TrimStart('/').Replace('/', Path.DirectorySeparatorChar) + ".xml");
 
                 if (File.Exists(path))
                 {
                     MusicStream musicStream = new MusicStream(path);
 
-                    musicStream.AddClient(socket, sendIcyMeta);
+                    musicStream.AddClient(client, sendIcyMeta);
 
-                    Task.Factory.StartNew(() => musicStream.Run(cancellationToken));
+                    Task.Run((Action)musicStream.Run, cancellationToken);
 
                     streams.Add(requestSplit[1], musicStream);
                 }
                 else
                 {
-                    socket.Close();
+                    client.Close();
                 }
             }
         }
 
-        public void Start()
-        {
-            tcpListener.Start();
-
-            cancellationToken = new CancellationTokenSource();
-
-            Task.Factory.StartNew(() =>
-                {
-                    try
-                    {
-                        while (!cancellationToken.IsCancellationRequested)
-                        {
-                            Socket socket = tcpListener.AcceptSocket();
-
-                            if (Connection != null)
-                                Connection.BeginInvoke(socket, cancellationToken.Token, (ar) =>
-                                    {
-                                        try
-                                        {
-                                            ((ConnectionEventHandler)((AsyncResult)ar).AsyncDelegate).EndInvoke(ar);
-                                        }
-                                        catch (Exception ex)
-                                        {
-                                            Console.WriteLine(ex.Message);
-                                        }
-                                    },
-                               null);
-                        }
-                    }
-                    catch
-                    {
-                        Console.WriteLine("TcpListener Stopped.");
-                    }
-                });
-        }
-
-        public void Stop()
-        {
-            if (cancellationToken != null)
-            {
-                cancellationToken.Cancel();
-
-                tcpListener.Stop();
-            }
-        }
-
-        public delegate void ConnectionEventHandler(Socket socket, CancellationToken cancellationToken);
-
         public event ConnectionEventHandler Connection;
+
+        public delegate void ConnectionEventHandler(TcpClient client, CancellationToken cancellationToken);
     }
 }
