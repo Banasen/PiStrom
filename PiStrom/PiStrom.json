@@ -1,0 +1,11 @@
+﻿{
+  "port": 1337,
+  "defaultMusic": {
+    "time": {
+      "from": 0,
+      "till": "23:59"
+    },
+
+    "folders": [ "C:\\Users\\Banane9\\Music\\1024mb" ]
+  }
+}

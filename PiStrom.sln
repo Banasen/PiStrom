@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-VisualStudioVersion = 12.0.21005.1
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PiStrom", "PiStrom\PiStrom.csproj", "{6D436F72-6161-4043-9BE4-629517B17DC5}"
 EndProject
@@ -12,15 +12,15 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		README.md = README.md
 	EndProjectSection
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Icons", "Icons", "{4A7E0603-0724-442A-AD59-1A0962C55F1C}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Icons", "Icons", "{ABA85D0A-1FC2-4514-8236-2B67E381085C}"
 	ProjectSection(SolutionItems) = preProject
-		PiStrom.hqx = PiStrom.hqx
-		PiStrom.icns = PiStrom.icns
-		PiStrom.pdn = PiStrom.pdn
-		PiStrom.png = PiStrom.png
-		PiStrom_16x16.ico = PiStrom_16x16.ico
-		PiStrom_32x32.ico = PiStrom_32x32.ico
-		PiStrom_64x64.ico = PiStrom_64x64.ico
+		Icons\PiStrom.hqx = Icons\PiStrom.hqx
+		Icons\PiStrom.icns = Icons\PiStrom.icns
+		Icons\PiStrom.pdn = Icons\PiStrom.pdn
+		Icons\PiStrom.png = Icons\PiStrom.png
+		Icons\PiStrom_16x16.ico = Icons\PiStrom_16x16.ico
+		Icons\PiStrom_32x32.ico = Icons\PiStrom_32x32.ico
+		Icons\PiStrom_64x64.ico = Icons\PiStrom_64x64.ico
 	EndProjectSection
 EndProject
 Global

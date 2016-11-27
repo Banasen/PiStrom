@@ -38,6 +38,10 @@
     <ApplicationIcon>PiStrom_64x64.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -47,38 +51,27 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Config\PiStrom.cs">
-      <DependentUpon>PiStrom.xsd</DependentUpon>
-    </Compile>
-    <Compile Include="Config\StreamInfo.cs">
-      <DependentUpon>StreamInfo.xsd</DependentUpon>
-    </Compile>
+    <Compile Include="Config\MusicSource.cs" />
+    <Compile Include="Config\PiStromConfig.cs" />
+    <Compile Include="Config\StreamInfo.cs" />
+    <Compile Include="Config\Time.cs" />
     <Compile Include="Http\Server.cs" />
     <Compile Include="MusicStream.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Config\PiStrom.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
     <Content Include="PiStrom_64x64.ico" />
     <None Include="app.config" />
-    <None Include="Config\PiStrom.xsd">
-      <SubType>Designer</SubType>
+    <None Include="PiStrom.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <Content Include="Streams\Electro.xml">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
+    <None Include="packages.config" />
+    <None Include="Streams\Electro.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <ItemGroup />
-  <ItemGroup>
-    <None Include="Config\StreamInfo.xsd">
-      <SubType>Designer</SubType>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

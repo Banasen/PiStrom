@@ -1,0 +1,35 @@
+﻿{
+  "name": "Electro Stream",
+  "genre": "Electro",
+  "metaInterval": 65536,
+  "targetByteRate": 25000,
+  "music": {
+    "fileType": "mp3",
+    "sources": [
+      {
+        "time": {
+          "from": "12:00",
+          "till": "21:00"
+        },
+
+        "folders": [ "C:\\Users\\Banane9\\Music\\Binärpilot" ]
+      },
+      {
+        "time": {
+          "from": "21:00",
+          "till": "22:40"
+        },
+
+        "folders": [ "C:\\Users\\Banane\\Music\\Chipzel" ]
+      },
+      {
+        "time": {
+          "from": "22:50",
+          "till": "22:54"
+        },
+
+        "files": [ "C:\\Users\\Banane9\\Music\\Popcorn\\Popcorn.mp3" ]
+      }
+    ]
+  }
+}

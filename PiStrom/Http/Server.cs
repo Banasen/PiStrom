@@ -141,7 +141,7 @@ namespace PiStrom.Http
             }
             else
             {
-                string path = Path.Combine(rootDirectory.FullName, "Streams", requestSplit[1].TrimStart('/').Replace('/', Path.DirectorySeparatorChar) + ".xml");
+                string path = Path.Combine(rootDirectory.FullName, "Streams", requestSplit[1].TrimStart('/').Replace('/', Path.DirectorySeparatorChar) + ".json");
 
                 if (File.Exists(path))
                 {

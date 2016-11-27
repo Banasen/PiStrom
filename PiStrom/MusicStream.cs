@@ -1,4 +1,5 @@
-﻿using PiStrom.Config;
+﻿using Newtonsoft.Json;
+using PiStrom.Config;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -6,14 +7,13 @@ using System.Linq;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
-using System.Xml;
-using System.Xml.Schema;
-using System.Xml.Serialization;
 
 namespace PiStrom
 {
     public class MusicStream
     {
+        private static readonly JsonSerializer serializer = new JsonSerializer();
+
         private Dictionary<TcpClient, bool> clients;
         private int delay;
         private byte[] fileBuffer;
@@ -25,28 +25,23 @@ namespace PiStrom
 
         public MusicStream(string configPath)
         {
-            XmlReader reader = XmlReader.Create(configPath);
-            XmlSchema schema = new XmlSchema();
-            schema.SourceUri = @"Config" + Path.DirectorySeparatorChar + "StreamInfo.xsd";
-            reader.Settings.Schemas.Add(schema);
-            XmlSerializer serializer = new XmlSerializer(typeof(StreamInfo));
-            StreamInfo = (StreamInfo)serializer.Deserialize(reader);
+            StreamInfo = serializer.Deserialize<StreamInfo>(new JsonTextReader(new StreamReader(configPath)));
 
             clients = new Dictionary<TcpClient, bool>();
 
-            fileBuffer = new byte[StreamInfo.MetaInt];
+            fileBuffer = new byte[StreamInfo.MetaInterval];
 
-            delay = (int)(((double)StreamInfo.MetaInt / (double)StreamInfo.TargetByteRate) * 1000d);
+            delay = (int)(((double)StreamInfo.MetaInterval / (double)StreamInfo.TargetByteRate) * 1000d);
 
             Running = false;
         }
 
         public void AddClient(TcpClient client, bool metaInfo)
         {
-            string responseHeader = "HTTP/1.1 200 OK\r\nContent-Type: application/octet-stream\r\nServer: PiStrøm\r\nCache-Control: no-cache\r\nPragma: no-cache\r\nConnection: close\r\n" + (metaInfo ? "icy-metaint:" + StreamInfo.MetaInt + "\r\nicy-name:" + StreamInfo.Name + "\r\nicy-genre:" + StreamInfo.Genre + "\r\n" : "") + "\r\n"; //icy-url:http://localhost:1337\r\n type: audio/mpeg
+            string responseHeader = "HTTP/1.1 200 OK\r\nContent-Type: application/octet-stream\r\nServer: PiStrøm\r\nCache-Control: no-cache\r\nPragma: no-cache\r\nConnection: close\r\n" + (metaInfo ? "icy-metaint:" + StreamInfo.MetaInterval + "\r\nicy-name:" + StreamInfo.Name + "\r\nicy-genre:" + StreamInfo.Genre + "\r\n" : "") + "\r\n"; //icy-url:http://localhost:1337\r\n type: audio/mpeg
 
             var headerBytes = Encoding.UTF8.GetBytes(responseHeader);
-            client.GetStream().WriteAsync(headerBytes, 0, headerBytes.Length);
+            client.GetStream().Write(headerBytes, 0, headerBytes.Length);
 
             lock (clients)
                 clients.Add(client, metaInfo);
@@ -63,13 +58,13 @@ namespace PiStrom
 
             while (clients.Count > 0)
             {
-                int read = fileStream.Read(fileBuffer, 0, StreamInfo.MetaInt);
+                int read = fileStream.Read(fileBuffer, 0, StreamInfo.MetaInterval);
 
-                if (read < StreamInfo.MetaInt)
+                if (read < StreamInfo.MetaInterval)
                 {
                     selectNextSong();
 
-                    fileStream.Read(fileBuffer, read, StreamInfo.MetaInt - read);
+                    fileStream.Read(fileBuffer, read, StreamInfo.MetaInterval - read);
                 }
 
                 var remove = new List<TcpClient>();

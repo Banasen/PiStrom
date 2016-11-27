@@ -1,8 +1,0 @@
-﻿<?xml version="1.0" encoding="utf-8" ?>
-<PiStrom>
-  <Port>1337</Port>
-  <DefaultMusic>
-    <File>C:\Users\Banane\Music\Benny Hill Theme.mp3</File>
-    <Folder>C:\Users\Banane\Music\Danjyon Kimura</Folder>
-  </DefaultMusic>
-</PiStrom>
